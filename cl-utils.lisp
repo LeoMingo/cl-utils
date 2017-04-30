@@ -14,6 +14,8 @@
            :seq     ;A reverse of subseq
 
            :insert-arr
+           :fst
+           :snd
 
            :read-str
            :read-line-arr
@@ -126,8 +128,10 @@
     (concarr leftside rightside)))
 
 
-
-
+(defun fst (arr) 
+  (aref arr 0))
+(defun snd (arr)
+  (aref arr 1))
 
 
 
