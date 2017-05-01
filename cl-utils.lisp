@@ -1,5 +1,6 @@
 (defpackage cl-utils
-  (:export :make-adjustable-string
+  (:export :make-adjustable-array
+           :make-adjustable-string
            :push-char
            :split-at
            
@@ -24,7 +25,13 @@
            :write-line-arr))
 
 
-
+(defun make-adjustable-array (arr)
+  (make-array (length arr)
+              :fill-pointer (length arr)
+              ;:fill-pointer t
+              :adjustable t
+              :initial-contents arr
+              :element-type (array-element-type arr)))
 
 (defun make-adjustable-string (str) 
   (make-array (length str)
@@ -53,7 +60,7 @@
                                :adjustable t
                                :element-type 'character
                                :initial-contents ""))
-            (str-init (make-array '(0) 
+            (empty-str (make-array '(0) 
                                :fill-pointer t
                                :adjustable t
                                :element-type 'character
@@ -63,8 +70,8 @@
             do      (if (equal (aref str idx) token) 
                         (progn 
                             (vector-push-extend str-temp str-arr)
-                            (setf str-temp str-init))
-                        (push-char (aref str idx) str-temp)))    
+                            (setf str-temp empty-str))
+                        (setf str-temp (push-char (aref str idx) str-temp))))    
 
         (vector-push-extend str-temp str-arr)
         str-arr))
@@ -76,13 +83,13 @@
   (let ((new-str ""))
     (dotimes (i (length body))
       (setf new-str (concatenate 'string new-str (nth i body))))
-    new-str))
+    (make-adjustable-string new-str)))
 
 (defun concarr (&rest body)
   (let ((new-arr (make-array '(0) :adjustable t :fill-pointer t)))
     (dotimes (i (length body))
       (setf new-arr (concatenate 'array new-arr (nth i body))))
-    new-arr))
+    (make-adjustable-array new-arr)))
 
 
 (defun trim-arr-edge (arr edge)
@@ -176,6 +183,7 @@
     (dotimes (i (1- (length file-arr)))
       (setf temp-str (push-char #\newline (aref file-arr i)))
       (setf str (concstr str temp-str)))
+    ;;Lastly we set the last line without #\newline
     (setf str (concstr str (aref file-arr (1- (length file-arr)))))
     str))
   
