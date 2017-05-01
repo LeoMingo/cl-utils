@@ -136,7 +136,7 @@
 
 
 
-(defun inser-str (str-base str-inserted idx)
+(defun insert-str (str-base str-inserted idx)
   (let ((csi (concatenate 'array str-inserted))
         (new-str (concatenate 'array str-base)))
        (dotimes (i (length csi))
