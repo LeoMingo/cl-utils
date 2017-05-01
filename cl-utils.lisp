@@ -16,6 +16,9 @@
 
            :insert-arr
            :insert-str
+           :incremental-arr-check
+           :insert-str-all
+    
            :fst
            :snd
 
@@ -152,6 +155,35 @@
 
 
 
+
+(defun incremental-arr-check (base-arr checked-arr idx)
+  (let ((bool-rst t)
+        (ba-len (length base-arr))
+        (checked-len (length checked-arr)))
+    (if (> (+ checked-len idx) ba-len)  ;exclude the case of index of base-arr out range
+      (setf bool-rst nil)
+      (dotimes (i checked-len)
+         (if (not (equal (aref checked-arr i) (aref base-arr (+ i idx))))
+           (setf bool-rst nil))))
+    bool-rst))
+
+
+(defun insert-str-all (str-base str-tok str-ins)
+  (let ((rst-str (make-adjustable-string ""))
+        (strlen-1 (- (length str-tok) 1))
+        (sblen (length str-base)))
+    (dotimes (i (- sblen strlen-1))
+      (if (incremental-arr-check str-base str-tok i)
+        (progn (setf rst-str (concstr rst-str str-ins))
+               (setf rst-str (push-char (aref str-base i) rst-str)))
+        (setf rst-str (push-char (aref str-base i) rst-str))))
+    (dotimes (i strlen-1)
+      (setf rst-str (push-char (aref str-base (+ (- sblen strlen-1) i)) rst-str)))
+   rst-str))
+
+
+
+
 (defun fst (arr) 
   (aref arr 0))
 (defun snd (arr)
@@ -175,17 +207,26 @@
       (close in)))
   file-str-arr)
 
+(defun flatten-array (arr)
+"Flatten a 2-dimensional array into a 1-dimentional array"
+  (let ((new-arr (make-adjustable-array #())))
+    (dotimes (i (length arr))
+      (setf new-arr (concarr new-arr (aref arr i))))
+    new-arr))
 
-(defun read-str (filename)
+(defun read-str (filename &key (newline nil))
   (let ((file-arr (read-line-arr filename))
         (temp-str "")
         (str ""))
-    (dotimes (i (1- (length file-arr)))
-      (setf temp-str (push-char #\newline (aref file-arr i)))
-      (setf str (concstr str temp-str)))
-    ;;Lastly we set the last line without #\newline
-    (setf str (concstr str (aref file-arr (1- (length file-arr)))))
-    str))
+    (if newline
+      (progn
+        (dotimes (i (1- (length file-arr)))
+          (setf temp-str (push-char #\newline (aref file-arr i)))
+          (setf str (concstr str temp-str)))
+          ;;Lastly we set the last line without #\newline
+          (setf str (concstr str (aref file-arr (1- (length file-arr))))))
+      (setf str (flatten-array file-arr)))
+    (char-arr->str str)))
   
   
 
