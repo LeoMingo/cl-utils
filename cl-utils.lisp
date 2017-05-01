@@ -14,6 +14,7 @@
            :seq     ;A reverse of subseq
 
            :insert-arr
+           :insert-str
            :fst
            :snd
 
@@ -71,11 +72,17 @@
 
 
 
-(defun concstr (str1 str2)
-  (concatenate 'string str1 str2))
+(defun concstr (&rest body)
+  (let ((new-str ""))
+    (dotimes (i (length body))
+      (setf new-str (concatenate 'string new-str (nth i body))))
+    new-str))
 
-(defun concarr (arr1 arr2)
-  (concatenate 'array arr1 arr2))
+(defun concarr (&rest body)
+  (let ((new-arr (make-array '(0) :adjustable t :fill-pointer t)))
+    (dotimes (i (length body))
+      (setf new-arr (concatenate 'array new-arr (nth i body))))
+    new-arr))
 
 
 (defun trim-arr-edge (arr edge)
@@ -110,7 +117,7 @@
   (let ((len (length char-arr))
         (str (make-adjustable-string "")))
     (dotimes (i len)
-      (push-char (aref char-arr i) str))
+      (setf str (push-char (aref char-arr i) str)))
     str))
 
 
@@ -121,11 +128,21 @@
     (setf arr (trim-arr-edge arr "e")))
   arr)
 
-(defun insert-arr (arr i ele)
+(defun insert-arr (arr ele i)
   (let ((leftside (seq arr i))
         (rightside (subseq arr i)))
     (vector-push-extend ele leftside)
     (concarr leftside rightside)))
+
+
+
+(defun inser-str (str-base str-inserted idx)
+  (let ((csi (concatenate 'array str-inserted))
+        (new-str (concatenate 'array str-base)))
+       (dotimes (i (length csi))
+         (setf new-str (insert-arr new-str (aref csi i)(+ i idx))))
+    (char-arr->str new-str)))
+
 
 
 (defun fst (arr) 
