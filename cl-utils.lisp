@@ -155,6 +155,12 @@
 
 
 
+#||
+Add incremental-arr-reverse-check
+Add insert-str-rever-idx-all
+||#
+
+
 
 (defun incremental-arr-check (base-arr checked-arr idx)
   (let ((bool-rst t)
@@ -245,7 +251,7 @@
                        :if-does-not-exist :create)
     (dotimes (i (length line-arr))
       (princ #\newline stm)
-      (princ (aref line-arr i)))))
+      (princ (aref line-arr i) stm))))
 
 
 
